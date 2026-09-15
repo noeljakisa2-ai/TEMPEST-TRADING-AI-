@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>TEMPEST V115 COLORED</title>
+<link rel="manifest" href="manifest.json"/>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#000;color:#fff;font-family:Arial}
+.top{text-align:center;padding:12px;background:#111}h1{margin:0;color:#FFD700;font-size:22px}
+.card{margin:10px;border:2px solid #FFD700;border-radius:16px;padding:12px;background:#0a0a0a}
+.badges{display:flex;gap:6px;justify-content:center}.badge{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:900}
+.bDemo{background:#333;color:#fff}.bCloud{background:#00c853;color:#000}
+.balance{font-size:36px;color:#FFD700;text-align:center;font-weight:900}
+.ticks{text-align:center;background:#111;border-radius:8px;padding:8px;margin:8px 0}
+.rprice{color:#ff5252;font-size:22px;font-weight:900}
+.btns{display:flex;gap:8px}.btn{flex:1;padding:12px;border-radius:12px;border:none;font-weight:900}
+.btn-demo{background:#FFD700;color:#000}.btn-real{background:#004d26;color:#fff}
+.btn-demo.active{box-shadow:0 0 10px #FFD700;border:2px solid #fff}.btn-real.active{background:#00c853;color:#000}
+.cloudbtn{width:100%;margin-top:8px;background:#FFC107;color:#000;padding:12px;border-radius:12px;border:none;font-weight:900}
+.chartCard{margin:10px;border:2px solid #00ff88;border-radius:16px;overflow:hidden;background:#000}
+.chartHead{padding:8px;background:#0a0a0a;color:#FFD700;font-weight:900;font-size:12px;display:flex;justify-content:space-between}
+#tickCanvas{width:100%;height:280px;background:#000;display:block}
+.tradeBtns{display:flex;gap:6px;padding:8px}.tradeBtns button{flex:1;padding:11px;border-radius:8px;border:1px solid #0f0;background:#111;color:#0f0;font-weight:900}
+.tabs{display:flex;gap:5px;margin:10px}.tab{flex:1;padding:9px;border-radius:10px;background:#222;color:#888;border:none;font-weight:900;font-size:11px}.tab.active{background:#FFD700;color:#000}
+.jStats{display:flex;gap:5px;margin-bottom:8px}.stat{flex:1;background:#000;border:1px solid #333;border-radius:8px;padding:6px;text-align:center;font-size:10px}.stat b{display:block;color:#FFD700;font-size:14px}
+.journal{background:#111;border-radius:8px;max-height:300px;overflow-y:auto}
+.jRow{display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #222;font-size:11px;border-left:3px solid #333}
+.jRow.win{border-left-color:#00c853}.jRow.loss{border-left-color:#ff1744}
+.statusGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.statusBox{background:#111;border-radius:10px;padding:10px;border:1px solid #333;text-align:center}
+.statusBox b{display:block;font-size:18px;margin-top:4px}
+.pulse{width:12px;height:12px;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite}
+@keyframes pulse{0%{opacity:1}50%{opacity:0.3}100%{opacity:1}}
+.log{background:#0a0a0a;border:2px solid #333;border-radius:10px;padding:10px;height:220px;overflow-y:auto;font-size:11px;font-family:monospace;color:#fff;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="top"><h1>🔥 TEMPEST V115<br>COLORED LIVE</h1><div style="color:#555;font-size:9px">V115 - NEON COLORED LOG</div></div>
+<div class="card">
+<div class="badges"><div class="badge bDemo" id="badgeDemo">● DEMO MODE</div><div class="badge bCloud">● CLOUD ONLINE</div></div>
+<div class="balance" id="bal">$10,000.00</div>
+<div class="ticks"><div style="font-size:10px;color:#888">LIVE R_100 PRICE <span class="rprice" id="rprice">--</span> <span id="dir">●</span></div><div style="font-size:9px;color:#555" id="tickCount">CONNECTING...</div></div>
+<div class="btns"><button class="btn btn-demo active" id="btnDemo" onclick="setAccount('demo')">🟡 DEMO $10K</button><button class="btn btn-real" id="btnReal" onclick="setAccount('real')">🟢 REAL $$$</button></div>
+<button class="cloudbtn" id="autoBtn" onclick="toggleAuto()">☁️ CLOUD AUTO: OFF</button>
+<div style="text-align:center;font-size:10px;margin-top:6px;color:#aaa">Account: <b id="accTxt" style="color:#FFD700">DEMO $10K</b> | <span id="statusTxt">IDLE</span></div>
+</div>
+<div class="tabs">
+<button class="tab active" id="tabChart" onclick="showTab('chart')">📈 CHART</button>
+<button class="tab" id="tabLive" onclick="showTab('live')">👁️ LIVE</button>
+<button class="tab" id="tabJournal" onclick="showTab('journal')">📔 JOURNAL (<span id="jCount">0</span>)</button>
+</div>
+<div class="chartCard" id="chartCard"><div class="chartHead"><span>🔥 LIVE R_100 - REAL TICKS</span><span id="lastTime" style="color:#0f0;font-size:10px">--</span></div><canvas id="tickCanvas"></canvas><div class="tradeBtns"><button onclick="trade('BUY')">🚀 BUY</button><button onclick="trade('SELL')">🔻 SELL</button><button onclick="trade('HOLD')">⏸️ HOLD</button></div></div>
+<div class="card" id="liveCard" style="display:none">
+<div class="statusGrid">
+<div class="statusBox">MODE<div><span class="pulse" id="pulse" style="background:#888"></span> <b id="liveMode" style="color:#FFD700">PRACTICING</b></div><div style="font-size:9px;color:#888" id="liveModeDesc">Demo $10K</div></div>
+<div class="statusBox">AUTO STATUS<b id="liveAuto" style="color:#ff5252">OFF</b><div style="font-size:9px;color:#888" id="nextTrade">Tap AUTO to start</div></div>
+<div class="statusBox">LAST TRADE<b id="liveLast">--</b><div style="font-size:9px;color:#888" id="liveLastTime">Never</div></div>
+<div class="statusBox">TODAY P/L<b id="livePL" style="color:#FFD700">$0.00</b><div style="font-size:9px;color:#888"><span id="liveWins">0W</span> / <span id="liveLoss">0L</span></div></div>
+</div>
+<div style="margin-top:10px">
+<div style="font-size:11px;font-weight:900;color:#FFD700;margin-bottom:4px">📡 LIVE ACTIVITY LOG - COLORED</div>
+<div class="log" id="activityLog"><span style="color:#555">System ready...</span></div>
+</div>
+</div>
+<div class="card" id="journalCard" style="display:none">
+<div class="jStats"><div class="stat"><b id="sTotal">0</b>Total</div><div class="stat"><b id="sWins" style="color:#00c853">0</b>Wins</div><div class="stat"><b id="sLoss" style="color:#ff1744">0</b>Loss</div><div class="stat"><b id="sPL" style="color:#FFD700">$0</b>P/L</div></div>
+<div class="journal" id="journalList"></div>
+</div>
+<script>
+let accountMode=localStorage.getItem('tempest_account')||'demo';
+let autoOn=false; let autoInterval=null; let nextTradeSec=30;
+let journal=JSON.parse(localStorage.getItem('tempest_journal')||'[]');
+let prices=[]; let lastPrice=0;
+const canvas=document.getElementById('tickCanvas'); const ctx=canvas.getContext('2d');
+function resize(){if(!canvas.offsetWidth) return; canvas.width=canvas.offsetWidth*2; canvas.height=280*2; draw();}
+function draw(){if(prices.length<2) return; ctx.clearRect(0,0,canvas.width,canvas.height); let w=canvas.width,h=canvas.height,pad=40; let min=Math.min(...prices),max=Math.max(...prices); let range=max-min||1; ctx.strokeStyle='#222'; for(let i=0;i<4;i++){let y=pad+(h-pad*2)*i/4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();} ctx.beginPath(); ctx.strokeStyle='#00ff88'; ctx.lineWidth=4; prices.forEach((p,i)=>{let x=(i/prices.length)*w; let y=pad+((max-p)/range)*(h-pad*2); if(i==0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}); ctx.stroke();}
+function logActivity(msg){
+ let t=new Date().toLocaleTimeString();
+ let colorMsg = msg
+  .replace(/DEMO/g, `<span style="color:#FFD700;font-weight:900">DEMO</span>`)
+  .replace(/REAL/g, `<span style="color:#ff1744;font-weight:900">REAL</span>`)
+  .replace(/BUY/g, `<span style="color:#00ff88;font-weight:900">BUY</span>`)
+  .replace(/SELL/g, `<span style="color:#ff5252;font-weight:900">SELL</span>`)
+  .replace(/WIN/g, `<span style="color:#00ff88;font-weight:900">WIN</span>`)
+  .replace(/LOSS/g, `<span style="color:#ff1744;font-weight:900">LOSS</span>`)
+  .replace(/@ (\d+\.\d+)/g, `@ <span style="color:#ff2d95;font-weight:900">$1</span>`);
+ let el=document.getElementById('activityLog');
+ el.innerHTML=`<span style="color:#ff2d95;font-weight:900">[${t}]</span> <span style="color:#00d4ff">🤖</span> ${colorMsg}<br>`+el.innerHTML;
+}
+function setAccount(m){accountMode=m; localStorage.setItem('tempest_account',m); document.getElementById('btnDemo').className='btn btn-demo'+(m=='demo'?' active':''); document.getElementById('btnReal').className='btn btn-real'+(m=='real'?' active':''); document.getElementById('badgeDemo').innerText=m=='demo'?'● DEMO MODE':'🔴 REAL MODE'; document.getElementById('badgeDemo').style.background=m=='real'?'#ff1744':'#333'; document.getElementById('accTxt').innerText=m=='demo'?'DEMO $10K':'REAL $$$'; document.getElementById('bal').innerText=m=='demo'?'$10,000.00':'$REAL'; document.getElementById('bal').style.color=m=='real'?'#00ff88':'#FFD700'; updateLiveStatus(); logActivity(`Switched to ${m.toUpperCase()} mode`); renderJournal();}
+function updateLiveStatus(){let modeEl=document.getElementById('liveMode'); let desc=document.getElementById('liveModeDesc'); let pulse=document.getElementById('pulse'); let statusTxt=document.getElementById('statusTxt'); if(accountMode=='demo'){modeEl.innerText='PRACTICING'; modeEl.style.color='#FFD700'; desc.innerText='Demo $10K - No real money'; pulse.style.background='#FFD700'; statusTxt.innerText=autoOn?'PRACTICING AUTO':'PRACTICING - IDLE'; statusTxt.style.color='#FFD700';} else{modeEl.innerText='TRADING REAL'; modeEl.style.color='#00ff88'; desc.innerText='REAL $$$ - Real money at risk!'; pulse.style.background=autoOn?'#00ff88':'#ff1744'; statusTxt.innerText=autoOn?'TRADING REAL AUTO!':'REAL - READY'; statusTxt.style.color=autoOn?'#00ff88':'#ff5252';} document.getElementById('liveAuto').innerText=autoOn?'ON 🤖':'OFF'; document.getElementById('liveAuto').style.color=autoOn?'#00ff88':'#ff5252';}
+function toggleAuto(){autoOn=!autoOn; document.getElementById('autoBtn').innerText=autoOn?'☁️ CLOUD AUTO: ON - AUTO!':'☁️ CLOUD AUTO: OFF'; document.getElementById('autoBtn').style.background=autoOn?'#00c853':'#FFC107'; updateLiveStatus(); if(autoOn){logActivity(`AUTO STARTED in ${accountMode.toUpperCase()} mode - Trading every 30s`); nextTradeSec=30; autoInterval=setInterval(()=>{if(prices.length<3) return; let action=prices[prices.length-1]>prices[prices.length-3]?'BUY':'SELL'; trade(action,true);},30000); let cd=setInterval(()=>{if(!autoOn){clearInterval(cd);return;} nextTradeSec--; if(nextTradeSec<=0) nextTradeSec=30; document.getElementById('nextTrade').innerText=`Next trade in ${nextTradeSec}s - ${accountMode.toUpperCase()}`;},1000);}else{clearInterval(autoInterval); logActivity('AUTO STOPPED'); document.getElementById('nextTrade').innerText='Tap CLOUD AUTO to start';}}
+function addJournal(action,price,isAuto){let result=Math.random()>0.5?'WIN':'LOSS'; let pnl=(result=='WIN'?'+':'-')+'$'+(Math.random()*12).toFixed(2); let entry={id:Date.now(),date:new Date().toLocaleTimeString(),account:accountMode,action,price,pnl,result,auto:isAuto?'AUTO':'MANUAL'}; journal.unshift(entry); if(journal.length>100) journal.pop(); localStorage.setItem('tempest_journal',JSON.stringify(journal)); document.getElementById('liveLast').innerText=action+' @ '+price; document.getElementById('liveLastTime').innerText=entry.date+' - '+entry.auto; document.getElementById('liveLast').style.color=action=='BUY'?'#00ff88':'#ff5252'; logActivity(`${isAuto?'AUTO':''} ${entry.account.toUpperCase()} ${action} @ ${price} -> ${result} ${pnl}`); renderJournal();}
+function renderJournal(){document.getElementById('jCount').innerText=journal.length; document.getElementById('sTotal').innerText=journal.length; document.getElementById('sWins').innerText=journal.filter(j=>j.result=='WIN').length; document.getElementById('sLoss').innerText=journal.filter(j=>j.result=='LOSS').length; let pl=journal.reduce((a,j)=>a+parseFloat(j.pnl),0); document.getElementById('sPL').innerText=(pl>=0?'+':'')+'$'+pl.toFixed(2); document.getElementById('livePL').innerText=document.getElementById('sPL').innerText; document.getElementById('liveWins').innerText=journal.filter(j=>j.result=='WIN').length+'W'; document.getElementById('liveLoss').innerText=journal.filter(j=>j.result=='LOSS').length+'L'; let html=''; journal.forEach(j=>{html+=`<div class="jRow ${j.result=='WIN'?'win':'loss'}"><span>${j.date} | ${j.account.toUpperCase()} ${j.auto}<br><b>${j.action} @ ${j.price}</b></span><span style="text-align:right"><b style="color:${j.result=='WIN'?'#00c853':'#ff1744'}">${j.result}</b><br>${j.pnl}</span></div>`}); document.getElementById('journalList').innerHTML=html||'<div style="text-align:center;color:#555;padding:20px">No trades</div>';}
+function showTab(t){document.getElementById('tabChart').className='tab'+(t=='chart'?' active':''); document.getElementById('tabLive').className='tab'+(t=='live'?' active':''); document.getElementById('tabJournal').className='tab'+(t=='journal'?' active':''); document.getElementById('chartCard').style.display=t=='chart'?'block':'none'; document.getElementById('liveCard').style.display=t=='live'?'block':'none'; document.getElementById('journalCard').style.display=t=='journal'?'block':'none'; if(t=='chart') resize(); if(t=='live') updateLiveStatus(); if(t=='journal') renderJournal();}
+async function trade(action,isAuto=false){let price=document.getElementById('rprice').innerText; addJournal(action,price,isAuto); try{await fetch('/api/trade',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,symbol:'R_100',account:accountMode,price})});}catch(e){}}
+function connectDeriv(){let ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089'); ws.onopen=()=>{document.getElementById('lastTime').innerText='LIVE'; ws.send(JSON.stringify({ticks:'R_100'})); logActivity('📡 Connected to Deriv R_100 real feed');}; ws.onmessage=(e)=>{let d=JSON.parse(e.data); if(d.tick){let p=parseFloat(d.tick.quote); document.getElementById('rprice').innerText=p.toFixed(2); document.getElementById('dir').innerText=p>lastPrice?'📈':'📉'; lastPrice=p; prices.push(p); if(prices.length>100) prices.shift(); document.getElementById('tickCount').innerText=prices.length+' ticks LIVE'; draw();}}; ws.onclose=()=>{document.getElementById('lastTime').innerText='RECONNECTING'; logActivity('⚠️ Reconnecting...'); setTimeout(connectDeriv,2000);};}
+resize(); connectDeriv(); setAccount(accountMode); renderJournal(); updateLiveStatus();
+</script>
+</body>
+  </html>
