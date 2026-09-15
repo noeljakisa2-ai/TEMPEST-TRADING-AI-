@@ -1,0 +1,9 @@
+{
+  "name": "TEMPEST V104.1 ULTIMATE SOLO",
+  "short_name": "TEMPEST",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#FFD700",
+  "icons": [{ "src": "https://cdn-icons-png.flaticon.com/512/138/138292.png", "sizes": "512x512", "type": "image/png" }]
+}
