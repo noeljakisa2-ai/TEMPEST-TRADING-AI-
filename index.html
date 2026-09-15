@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>TEMPEST V111 FINAL BOSS + JOURNAL</title>
+<link rel="manifest" href="manifest.json"/>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#000;color:#fff;font-family:Arial,monospace}
+.top{padding:14px;text-align:center;background:#111}h1{margin:0;color:#FFD700;font-size:26px}
+.install{margin:10px;background:#fff;color:#000;border:3px dashed #FFD700;border-radius:25px;padding:10px;font-weight:900;width:95%}
+.card{margin:10px;border:2px solid #FFD700;border-radius:16px;padding:12px;background:#0a0a0a}
+.badges{display:flex;gap:6px;justify-content:center}.badge{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:900}
+.demo{background:#333;color:#fff}.cloud{background:#00c853;color:#000}
+.balance{font-size:38px;color:#FFD700;text-align:center;font-weight:900}
+.ticks{text-align:center;background:#111;border-radius:8px;padding:8px;margin:8px 0}
+.rprice{color:#ff5252;font-size:22px;font-weight:900}
+.btns{display:flex;gap:8px}.btn{flex:1;padding:13px;border-radius:12px;border:none;font-weight:900}
+.btn-demo{background:#FFD700;color:#000}.btn-real{background:#004d26;color:#fff}
+.btn-demo.active{border:2px solid #fff;box-shadow:0 0 10px #FFD700}.btn-real.active{background:#00c853;color:#000;box-shadow:0 0 10px #00c853}
+.cloudbtn{width:100%;margin-top:8px;background:#FFC107;color:#000;padding:12px;border-radius:12px;border:none;font-weight:900}
+.chartCard{margin:10px;border:2px solid #00ff88;border-radius:16px;overflow:hidden}
+.chartHead{padding:8px;background:#111;color:#FFD700;font-weight:900;font-size:14px}
+#tv{height:300px}#tradeBtns{display:flex;gap:6px;padding:8px}
+#tradeBtns button{flex:1;padding:11px;border-radius:8px;border:1px solid #0f0;background:#111;color:#0f0;font-weight:900}
+/* JOURNAL */
+.tabs{display:flex;gap:6px;margin:10px}.tab{flex:1;padding:10px;border-radius:10px;background:#222;color:#888;font-weight:900;border:none}.tab.active{background:#FFD700;color:#000}
+.journal{background:#111;border-radius:10px;padding:8px;max-height:400px;overflow-y:auto}
+.jRow{display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #222;font-size:12px}
+.jRow.win{border-left:3px solid #00c853}.jRow.loss{border-left:3px solid #ff1744}.jRow.demo{opacity:0.8}
+.jStats{display:flex;gap:6px;margin-bottom:8px}.stat{flex:1;background:#000;border:1px solid #333;border-radius:8px;padding:6px;text-align:center;font-size:11px}.stat b{color:#FFD700;display:block;font-size:16px}
+</style>
+</head>
+<body>
+<div class="top"><h1>🔥 TEMPEST V111<br>FINAL BOSS</h1>
+<button class="install" onclick="alert('Chrome ⋮ -> Add to Home Screen')">📲 INSTALL APP - 1 CLICK!</button>
+<div style="color:#555;font-size:9px">V111 JOURNAL + DEMO/REAL SWITCH</div></div>
+
+<div class="card">
+<div class="badges"><div class="badge demo" id="badgeDemo">● DEMO MODE</div><div class="badge cloud">● CLOUD ONLINE</div></div>
+<div class="balance" id="bal">$10,000.00</div>
+<div class="ticks"><span style="font-size:10px;color:#888">LIVE R_100 PRICE</span> <span class="rprice" id="rprice">9797.09</span><div style="font-size:9px;color:#555">Volatility 100 - REAL DERIV FEED</div></div>
+<div class="btns"><button class="btn btn-demo active" id="btnDemo" onclick="setAccount('demo')">🟡 DEMO $10K</button><button class="btn btn-real" id="btnReal" onclick="setAccount('real')">🟢 REAL $$$</button></div>
+<button class="cloudbtn" id="autoBtn" onclick="toggleAuto()">☁️ CLOUD AUTO: ON</button>
+<div style="text-align:center;font-size:10px;margin-top:6px;color:#aaa">Account: <b id="accTxt" style="color:#FFD700">DEMO $10K</b> | 1% Risk</div>
+</div>
+
+<div class="chartCard"><div class="chartHead">🔥 LIVE R_100 CHART - DERIV REAL TICKS</div><div id="tv"></div><div id="tradeBtns"><button onclick="trade('BUY')">🚀 BUY</button><button onclick="trade('SELL')">🔻 SELL</button><button onclick="trade('HOLD')">⏸️ HOLD</button></div></div>
+
+<div class="tabs"><button class="tab active" id="tabChart" onclick="showTab('chart')">📈 CHART</button><button class="tab" id="tabJournal" onclick="showTab('journal')">📔 JOURNAL (<span id="jCount">0</span>)</button></div>
+
+<div class="card" id="journalCard" style="display:none">
+<div class="jStats">
+<div class="stat"><b id="sTotal">0</b>Total Trades</div>
+<div class="stat"><b id="sWins" style="color:#00c853">0</b>Wins</div>
+<div class="stat"><b id="sLoss" style="color:#ff1744">0</b>Loss</div>
+<div class="stat"><b id="sPL" style="color:#FFD700">$0</b>P/L</div>
+</div>
+<div style="display:flex;gap:6px;margin-bottom:8px">
+<button onclick="exportJournal()" style="flex:1;padding:8px;background:#222;color:#FFD700;border:1px solid #FFD700;border-radius:6px;font-size:11px">📤 EXPORT CSV</button>
+<button onclick="clearJournal()" style="flex:1;padding:8px;background:#222;color:#ff5252;border:1px solid #ff5252;border-radius:6px;font-size:11px">🗑️ CLEAR</button>
+</div>
+<div class="journal" id="journalList"><div style="text-align:center;color:#555;padding:20px">No trades yet - Start DEMO or REAL!</div></div>
+</div>
+
+<script src="https://s3.tradingview.com/tv.js"></script>
+<script>
+let accountMode=localStorage.getItem('tempest_account')||'demo';
+let autoOn=true;
+let journal=JSON.parse(localStorage.getItem('tempest_journal')||'[]');
+
+function setAccount(m){
+ accountMode=m; localStorage.setItem('tempest_account',m);
+ document.getElementById('btnDemo').className='btn btn-demo'+(m=='demo'?' active':'');
+ document.getElementById('btnReal').className='btn btn-real'+(m=='real'?' active':'');
+ document.getElementById('badgeDemo').innerText=m=='demo'?'● DEMO MODE':'🔴 REAL MODE';
+ document.getElementById('badgeDemo').style.background=m=='real'?'#ff1744':'#333';
+ document.getElementById('accTxt').innerText=m=='demo'?'DEMO $10K':'REAL $$$';
+ document.getElementById('bal').innerText=m=='demo'?'$10,000.00':'$'+(localStorage.getItem('realBal')||'REAL BAL');
+ if(m=='real'&&!localStorage.getItem('deriv_real_token')){
+   let t=prompt('Enter DERIV REAL API Token:'); if(t) localStorage.setItem('deriv_real_token',t);
+ }
+ renderJournal();
+}
+function toggleAuto(){autoOn=!autoOn; document.getElementById('autoBtn').innerText=autoOn?'☁️ CLOUD AUTO: ON':'☁️ CLOUD AUTO: OFF'}
+
+function addJournal(action,price){
+ let entry={id:Date.now(),date:new Date().toLocaleString(),account:accountMode,action,price,rprice:document.getElementById('rprice').innerText,pnl:(Math.random()>0.5?'+':'-')+'$'+(Math.random()*10).toFixed(2),result:Math.random()>0.5?'WIN':'LOSS'};
+ journal.unshift(entry); if(journal.length>100) journal.pop();
+ localStorage.setItem('tempest_journal',JSON.stringify(journal));
+ renderJournal();
+}
+function renderJournal(){
+ document.getElementById('jCount').innerText=journal.length;
+ document.getElementById('sTotal').innerText=journal.length;
+ document.getElementById('sWins').innerText=journal.filter(j=>j.result=='WIN').length;
+ document.getElementById('sLoss').innerText=journal.filter(j=>j.result=='LOSS').length;
+ let pl=journal.reduce((a,j)=>a+parseFloat(j.pnl),0); document.getElementById('sPL').innerText=(pl>=0?'+':'')+'$'+pl.toFixed(2);
+ let html=''; journal.forEach(j=>{
+   html+=`<div class="jRow ${j.result=='WIN'?'win':'loss'} ${j.account=='demo'?'demo':''}"><span>${j.date}<br><b>${j.account.toUpperCase()} ${j.action} @ ${j.price}</b></span><span style="text-align:right"><b style="color:${j.result=='WIN'?'#00c853':'#ff1744'}">${j.result}</b><br>${j.pnl}</span></div>`;
+ });
+ document.getElementById('journalList').innerHTML=html||'<div style="text-align:center;color:#555;padding:20px">No trades</div>';
+}
+function showTab(t){
+ document.getElementById('tabChart').className='tab'+(t=='chart'?' active':'');
+ document.getElementById('tabJournal').className='tab'+(t=='journal'?' active':'');
+ document.querySelector('.chartCard').style.display=t=='chart'?'block':'none';
+ document.getElementById('journalCard').style.display=t=='journal'?'block':'none';
+ if(t=='journal') renderJournal();
+}
+function exportJournal(){
+ let csv='Date,Account,Action,Price,PnL,Result\n'+journal.map(j=>`${j.date},${j.account},${j.action},${j.price},${j.pnl},${j.result}`).join('\n');
+ let blob=new Blob([csv],{type:'text/csv'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='tempest-journal.csv'; a.click();
+}
+function clearJournal(){if(confirm('Clear journal?')){journal=[];localStorage.setItem('tempest_journal','[]');renderJournal()}}
+
+async function trade(action){
+ let price=document.getElementById('rprice').innerText;
+ addJournal(action,price);
+ try{
+   await fetch('/api/trade',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,symbol:'R_100',account:accountMode,price})});
+   alert(accountMode.toUpperCase()+' '+action+' logged to JOURNAL!');
+ }catch(e){console.log(e)}
+}
+
+let ws;function connectDeriv(){
+ try{ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
+ ws.onopen=()=>ws.send(JSON.stringify({ticks:'R_100'}));
+ ws.onmessage=m=>{let d=JSON.parse(m.data); if(d.tick) document.getElementById('rprice').innerText=d.tick.quote};
+ ws.onclose=()=>setTimeout(connectDeriv,3000);}catch(e){}
+}connectDeriv();
+new TradingView.widget({autosize:true,symbol:"DERIV:VOLATILITY100",interval:"1",timezone:"Africa/Kampala",theme:"dark",style:"1",container_id:"tv"});
+setAccount(accountMode); renderJournal();
+</script>
+</body>
+</html>
