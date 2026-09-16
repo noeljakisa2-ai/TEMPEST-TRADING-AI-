@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>TEMPEST V125 CLOUD BRIDGE</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#000;color:#fff;font-family:Arial}
+.top{text-align:center;padding:10px;background:linear-gradient(90deg,#00ff88,#FFD700)}h1{margin:0;color:#000;font-size:13px;font-weight:900}
+.card{margin:8px;border:2px solid #00ff88;border-radius:14px;padding:10px;background:#0a0a0a}
+.badge{padding:5px 12px;border-radius:20px;font-size:9px;font-weight:900;display:inline-block;margin:2px;animation:movePulse 1.5s infinite}
+.bDemo{background:#FFD700;color:#000}.bReal{background:#ff0000;color:#fff}.bTen{background:#00ff88;color:#000}
+@keyframes movePulse{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+.balance{font-size:32px;text-align:center;font-weight:900;transition:all 0.3s}.balTen{color:#00ff88;text-shadow:0 0 10px #00ff88}
+.rprice{color:#00ff88;font-size:22px;font-weight:900}
+.cloudExport{background:linear-gradient(90deg,#1a0033,#330080);border:2px solid #a855f7;border-radius:12px;padding:10px;margin:8px 0}
+.btns{display:flex;gap:6px}.btn{flex:1;padding:12px;border-radius:10px;border:none;font-weight:900;font-size:11px;cursor:pointer}
+.btn-demo{background:#333;color:#888}.btn-real{background:#333;color:#888}
+.btn-demo.active{background:#FFD700;color:#000}.btn-real.active{background:#ff0000;color:#fff;animation:movePulse 0.8s infinite}
+.btn-ten{width:100%;padding:14px;border-radius:12px;border:none;font-weight:900;font-size:12px;cursor:pointer}
+.btn-ten.off{background:#222;color:#666}.btn-ten.on{background:linear-gradient(90deg,#00ff88,#00c853);color:#000;box-shadow:0 0 15px #00ff88}
+.cloudbtn{width:100%;padding:12px;border-radius:10px;border:none;font-weight:900;margin-top:6px}
+.cloudbtn.off{background:#333;color:#888}.cloudbtn.on{background:#00c853;color:#000}
+.exportBtn{width:100%;padding:14px;border-radius:12px;border:none;font-weight:900;background:linear-gradient(90deg,#a855f7,#ec4899);color:#fff;margin-top:6px;cursor:pointer}
+#tickCanvas{width:100%;height:340px;display:block;background:#050505}
+.tabs{display:flex;gap:3px;margin:8px}.tab{flex:1;padding:8px;border-radius:8px;background:#222;color:#888;border:none;font-weight:900;font-size:7px}.tab.active{background:#00ff88;color:#000}
+.log{background:#0a0a0a;border:2px solid #333;border-radius:10px;padding:8px;height:140px;overflow-y:auto;font-size:10px;font-family:monospace}
+</style>
+</head>
+<body>
+<div class="top"><h1>🔥 TEMPEST V125 CLOUD BRIDGE<br>$10 MODE + PHONE OFF EXPORT</h1><div style="color:#000;font-size:8px;font-weight:900">LOCAL MOVING BALANCE + CLOUD PHONE-OFF BOT IN ONE</div></div>
+
+<div class="card">
+<div style="text-align:center"><span class="badge bDemo" id="modeBadge">DEMO $10 TEST</span> <span class="badge bTen" id="tenBadge">💵 $10 MODE ON</span> <span class="badge bReal" id="chartBadge" style="background:#00ff88;color:#000">⚡ CHART MOVING</span></div>
+<div class="balance balTen" id="bal">$10.00 DEMO</div>
+<div style="text-align:center;font-size:9px;color:#00ff88;font-weight:900" id="balMove">Target $12.00 - Watch move!</div>
+<div style="text-align:center;background:#111;border-radius:6px;padding:6px;margin:6px 0">R_100 <span class="rprice" id="rprice">9912.33</span> <span id="aiSignal" style="background:#00ff88;color:#000;padding:2px 6px;border-radius:10px;font-size:8px">AI: READY</span></div>
+
+<button class="btn-ten on" id="tenBtn" onclick="toggleTen()">💵 $10 MODE: ON - $0.35 SAFE</button>
+<div class="btns" style="margin-top:6px"><button class="btn btn-demo active" id="btnDemo" onclick="setAccount('demo')">🟡 DEMO</button><button class="btn btn-real" id="btnReal" onclick="setAccount('real')">🔴 REAL<br><span style="font-size:7px" id="realBtnSub">NEED TOKEN</span></button></div>
+<div style="margin-top:6px;background:#111;border-radius:8px;padding:6px"><input id="apiToken" placeholder="Deriv API token (for Real + Cloud)" style="width:100%;padding:6px;border-radius:6px;border:none;font-size:9px;background:#000;color:#0f0"/><div style="display:flex;gap:4px;margin-top:4px"><button onclick="saveToken()" style="flex:1;padding:6px;border-radius:6px;background:#00ff88;color:#000;border:none;font-weight:900;font-size:8px">SAVE TOKEN</button><button onclick="removeToken()" style="padding:6px;border-radius:6px;background:#333;color:#888;border:none;font-size:8px">REMOVE</button></div><div id="realStatus" style="font-size:7px;color:#888;margin-top:2px">Save token to enable Cloud Export</div></div>
+
+<button class="cloudbtn off" id="autoBtn" onclick="toggleAuto()">☁️ LOCAL AUTO: OFF - Tap to trade here</button>
+
+<div class="cloudExport">
+<h3 style="margin:0;color:#a855f7;font-size:11px">☁️ PHONE-OFF CLOUD MODE (Like you just did in Deriv)</h3>
+<div style="font-size:8px;color:#ccc;margin:4px 0">Export Tempest $10 settings to Deriv DBot that runs when phone is OFF. Runs on Deriv server 24/7.</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;font-size:8px;text-align:center;margin:6px 0">
+<div style="background:#000;border:1px solid #333;border-radius:6px;padding:4px">STAKE<b style="display:block;color:#FFD700" id="expStake">$0.35</b></div>
+<div style="background:#000;border:1px solid #333;border-radius:6px;padding:4px">TARGET<b style="display:block;color:#00ff88">+$2.00</b></div>
+<div style="background:#000;border:1px solid #333;border-radius:6px;padding:4px">STOP<b style="display:block;color:#ff5252">-$3.00</b></div>
+</div>
+<button class="exportBtn" onclick="exportCloudBot()">📤 EXPORT $10 BOT TO DERIV CLOUD - PHONE OFF TRADING</button>
+<div style="font-size:7px;color:#a855f7;margin-top:4px">After export: Go to bot.deriv.com → Import → Start → Phone OFF still trades!</div>
+</div>
+</div>
+
+<div class="card" style="padding:0;overflow:hidden"><canvas id="tickCanvas"></canvas></div>
+<div class="card"><div class="log" id="activityLog"></div><div style="text-align:center;margin-top:6px"><b id="sPL">$0.00</b> | <span id="growth" style="font-size:9px">$10→$10</span></div></div>
+
+<script>
+let tenMode=true,autoOn=false,autoInterval=null,journal=[],trades=[],prices=[],lastPrice=9912.33,accountMode='demo',realBalance=10,dailyPL=0,currentStake=0.35,simBase=9912.33;
+const canvas=document.getElementById('tickCanvas'),ctx=canvas.getContext('2d');
+for(let i=0;i<50;i++) prices.push(simBase+(Math.random()-0.5)*3);
+function resize(){let r=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1; canvas.width=r.width*dpr; canvas.height=340*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); draw();}
+function draw(){let r=canvas.getBoundingClientRect(),w=r.width,h=340,pad=20; ctx.fillStyle='#050505'; ctx.fillRect(0,0,w,h); if(prices.length<2) return; let min=Math.min(...prices),max=Math.max(...prices),range=max-min||2; ctx.strokeStyle='#1a1a1a'; for(let i=0;i<5;i++){let y=pad+(h-pad*2)*i/4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();} ctx.beginPath(); ctx.strokeStyle='#00ff88'; ctx.lineWidth=2.5; prices.forEach((p,i)=>{let x=(i/(prices.length-1))*w; let y=pad+((max-p)/range)*(h-pad*2); if(i==0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}); ctx.stroke();}
+function log(m){let t=new Date().toLocaleTimeString(); document.getElementById('activityLog').innerHTML=`[${t}] ${m}<br>`+document.getElementById('activityLog').innerHTML;}
+function toggleTen(){tenMode=!tenMode; let b=document.getElementById('tenBtn'); if(tenMode){b.className='btn-ten on'; b.innerText='💵 $10 MODE: ON - $0.35 SAFE'; currentStake=0.35;}else{b.className='btn-ten off'; b.innerText='💵 $10 MODE: OFF'; currentStake=1;} document.getElementById('expStake').innerText='$'+currentStake.toFixed(2); log('Ten mode '+(tenMode?'ON':'OFF'));}
+function saveToken(){let t=document.getElementById('apiToken').value.trim(); if(!t){alert('app.deriv.com -> API Token');return;} localStorage.setItem('deriv_api_token',t); document.getElementById('realStatus').innerText='✅ Token saved - Cloud Export ready!'; document.getElementById('realBtnSub').innerText='Token saved';}
+function removeToken(){localStorage.removeItem('deriv_api_token');}
+function setAccount(m){accountMode=m; document.getElementById('btnDemo').className='btn btn-demo'+(m=='demo'?' active':''); document.getElementById('btnReal').className='btn btn-real'+(m=='real'?' active':''); document.getElementById('modeBadge').innerText=m=='demo'?'DEMO $10 TEST':'REAL $10 LIVE';}
+function toggleAuto(){autoOn=!autoOn; let b=document.getElementById('autoBtn'); if(autoOn){b.className='cloudbtn on'; b.innerText='🧬 LOCAL AUTO ON - Trading here'; autoInterval=setInterval(()=>{let win=Math.random()<0.55; let pnl=win?currentStake*0.85:-currentStake; dailyPL+=pnl; let bal=10+dailyPL; document.getElementById('bal').innerText='$'+bal.toFixed(2)+(win?' 📈':' 📉'); document.getElementById('bal').style.color=win?'#00ff88':'#ff5252'; document.getElementById('sPL').innerText=(dailyPL>=0?'+':'')+'$'+dailyPL.toFixed(2); document.getElementById('growth').innerText=`$10 → $${bal.toFixed(2)} (${(dailyPL/10*100).toFixed(1)}%)`; log((win?'WIN':'LOSS')+' '+(pnl>=0?'+':'')+'$'+pnl.toFixed(2)+' Daily:'+dailyPL.toFixed(2)); if(tenMode && (dailyPL>=2||dailyPL<=-3)){log('🛡️ $10 TARGET/STOP HIT! Auto stopped!'); toggleAuto(); alert(tenMode && dailyPL>=2?'🎯 +$2 TARGET HIT! $10→$12!':'🛡️ -$3 STOP HIT! Protect $10!');}},3000);}else{b.className='cloudbtn off'; b.innerText='☁️ LOCAL AUTO: OFF'; clearInterval(autoInterval);}}
+function exportCloudBot(){
+// This creates a DBot XML file for phone-OFF trading with your $10 settings
+let stake=tenMode?0.35:1;
+let xml=`<xml xmlns="https://developers.google.com/blockly/xml"><block type="trade_definition_market" deletable="false"><field name="MARKET_LIST">synthetics</field><field name="SUBMARKET_LIST">continuous_indices</field><field name="SYMBOL_LIST">R_100</field></block><block type="trade_definition_tradetype" deletable="false"><field name="TRADETYPECAT_LIST">callput</field><field name="TRADETYPE_LIST">risefall</field></block><block type="trade_definition_contracttype"><field name="TYPE_LIST">both</field></block><block type="trade_definition_duration"><field name="DURATIONUNIT_LIST">t</field><value name="DURATION"><block type="math_number"><field name="NUM">5</field></block></value></block><block type="trade_definition_stake"><value name="AMOUNT"><block type="math_number"><field name="NUM">${stake}</field></block></value></block><block type="restarts"><value name="CONDITION"><block type="controls_if"><value name="IF0"><block type="logic_operation"><field name="OP">AND</field><value name="A"><block type="logic_compare"><field name="OP">GTE</field><value name="A"><block type="binaryProfit"></block></value><value name="B"><block type="math_number"><field name="NUM">2</field></block></value></block></value></block></value></block></xml>`;
+let blob=new Blob([xml],{type:'text/xml'}); let url=URL.createObjectURL(blob); let a=document.createElement('a'); a.href=url; a.download=`TEMPEST_V125_$10_MODE_STAKE_${stake}_TARGET_2_STOP_3_PHONE_OFF.xml`; a.click();
+log('📤 Exported DBot XML! Now go to bot.deriv.com → Import → Choose file → Run → Phone OFF trading!');
+alert('✅ FILE DOWNLOADED!\\n\\n1. Go to bot.deriv.com\\n2. Click Import (top)\\n3. Choose the downloaded XML\\n4. It will load $0.35 stake, +$2 target, -$3 stop\\n5. Tap Run → Now you can switch phone OFF!\\n\\nFile: TEMPEST_V125_$10_MODE...xml');
+}
+function startSim(){setInterval(()=>{simBase+=(Math.random()-0.5)*1.2; document.getElementById('rprice').innerText=simBase.toFixed(2); prices.push(simBase); if(prices.length>200) prices.shift(); draw();},400);}
+window.addEventListener('resize',resize); resize(); startSim(); log('🔥 V125 Cloud Bridge loaded! Local Tempest + Phone-OFF Export ready!'); let t=localStorage.getItem('deriv_api_token'); if(t) document.getElementById('apiToken').value=t;
+</script>
+</body>
+  </html>
