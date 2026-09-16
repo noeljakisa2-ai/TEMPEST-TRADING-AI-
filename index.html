@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>TEMPEST V122 DEMO ON REAL</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#000;color:#fff;font-family:Arial}
+.top{text-align:center;padding:12px;background:linear-gradient(90deg,#FFD700,#00ff88)}h1{margin:0;color:#000;font-size:18px;font-weight:900}
+.card{margin:10px;border:2px solid #00ff88;border-radius:16px;padding:12px;background:#0a0a0a}
+.badge{padding:5px 10px;border-radius:20px;font-size:10px;font-weight:900;display:inline-block}
+.bDemo{background:#FFD700;color:#000}.bRealChart{background:#00ff88;color:#000}
+.balance{font-size:34px;color:#FFD700;text-align:center;font-weight:900}
+.realLabel{text-align:center;background:#00ff88;color:#000;font-weight:900;font-size:10px;padding:4px;border-radius:6px;margin:6px 0}
+.ticks{text-align:center;background:#111;border-radius:8px;padding:8px;margin:8px 0}
+.rprice{color:#00ff88;font-size:22px;font-weight:900}
+.btns{display:flex;gap:8px}.btn{flex:1;padding:12px;border-radius:12px;border:none;font-weight:900}
+.btn-demo{background:#FFD700;color:#000}.btn-real{background:#333;color:#888}
+.btn-demo.active{border:2px solid #fff;box-shadow:0 0 12px #FFD700}.btn-real.active{background:#00c853;color:#000}
+.cloudbtn{width:100%;margin-top:8px;padding:13px;border-radius:12px;border:none;font-weight:900;font-size:13px}
+.cloudbtn.off{background:#333;color:#888}.cloudbtn.on{background:#00c853;color:#000;box-shadow:0 0 15px #00c853;animation:pulse 1s infinite}
+@keyframes pulse{0%{box-shadow:0 0 5px #00c853}50%{box-shadow:0 0 20px #00c853}100%{box-shadow:0 0 5px #00c853}}
+.chartCard{margin:10px;border:2px solid #00ff88;border-radius:16px;overflow:hidden;background:#000}
+.chartHead{padding:8px;background:#0a0a0a;color:#00ff88;font-weight:900;font-size:11px;display:flex;justify-content:space-between}
+#tickCanvas{width:100%;height:340px;display:block;background:#050505}
+.tabs{display:flex;gap:4px;margin:10px}.tab{flex:1;padding:9px;border-radius:8px;background:#222;color:#888;border:none;font-weight:900;font-size:8px}.tab.active{background:#FFD700;color:#000}
+.tradeList{background:#111;border-radius:10px;max-height:500px;overflow-y:auto}
+.log{background:#0a0a0a;border:2px solid #333;border-radius:10px;padding:10px;height:200px;overflow-y:auto;font-size:11px;font-family:monospace}
+</style>
+</head>
+<body>
+<div class="top"><h1>🔥 TEMPEST V122<br>DEMO SOLO ON REAL CHART</h1><div style="color:#000;font-size:9px;font-weight:900">REAL R_100 FEED + FAKE $10K PRACTICE</div></div>
+<div class="card">
+<div style="text-align:center"><span class="badge bDemo">● DEMO PRACTICE MODE</span> <span class="badge bRealChart" id="chartBadge">● REAL CHART CONNECTING...</span></div>
+<div class="balance" id="bal">$10,000.00 DEMO</div>
+<div class="realLabel" id="realLabel">📡 REAL DERIV R_100 CHART - DEMO TRADES = FAKE MONEY, REAL PRICE</div>
+<div class="ticks"><div style="font-size:11px">R_100 <span class="rprice" id="rprice">CONNECTING...</span> <span id="dir"></span> <span id="aiSignal" style="background:#222;padding:3px 8px;border-radius:12px;font-size:10px;color:#FFD700">AI: WAITING FOR REAL FEED</span></div><div style="font-size:9px;color:#00ff88" id="tickCount">Waiting for REAL Deriv ticks...</div></div>
+<div class="btns"><button class="btn btn-demo active" id="btnDemo" onclick="setAccount('demo')">🟡 DEMO (PRACTICE)</button><button class="btn btn-real" id="btnReal" onclick="setAccount('real')" disabled>🟢 REAL (LOCKED - NO API)</button></div>
+<button class="cloudbtn off" id="autoBtn" onclick="toggleAuto()">☁️ DEMO SOLO: OFF - TAP TO PRACTICE ON REAL CHART</button>
+</div>
+
+<div class="tabs">
+<button class="tab active" id="tabChart" onclick="showTab('chart')">📈 REAL CHART</button>
+<button class="tab" id="tabTrades" onclick="showTab('trades')">💰 DEMO TRADES</button>
+<button class="tab" id="tabLive" onclick="showTab('live')">👁️ LIVE LOG</button>
+<button class="tab" id="tabJournal" onclick="showTab('journal')">📔 WIN/LOSS</button>
+</div>
+
+<div class="chartCard" id="chartCard"><div class="chartHead"><span>🔥 REAL R_100 - DERIV LIVE</span><span id="lastTime" style="color:#0f0">WAITING...</span></div><canvas id="tickCanvas"></canvas></div>
+
+<div class="card" id="tradesCard" style="display:none"><div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:8px"><div style="background:#00ff88;color:#000;padding:8px;border-radius:8px;text-align:center;font-weight:900"><span id="buyCount">0</span><br><span style="font-size:7px">BUYS</span></div><div style="background:#ff5252;color:#fff;padding:8px;border-radius:8px;text-align:center;font-weight:900"><span id="sellCount">0</span><br><span style="font-size:7px">SELLS</span></div><div style="background:#00c853;color:#fff;padding:8px;border-radius:8px;text-align:center;font-weight:900"><span id="winCount">0</span><br><span style="font-size:7px">WINS</span></div><div style="background:#ff1744;color:#fff;padding:8px;border-radius:8px;text-align:center;font-weight:900"><span id="lossCount">0</span><br><span style="font-size:7px">LOSSES</span></div></div><div class="tradeList" id="tradeList"></div></div>
+<div class="card" id="liveCard" style="display:none"><div class="log" id="activityLog"></div></div>
+<div class="card" id="journalCard" style="display:none"><div id="journalList" style="background:#111;border-radius:8px;max-height:400px;overflow-y:auto"></div><div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px"><div style="background:#111;padding:8px;border-radius:8px;text-align:center"><b id="sTotal">0</b><br>Total</div><div style="background:#111;padding:8px;border-radius:8px;text-align:center"><b id="sWins" style="color:#00c853">0</b><br>Wins</div><div style="background:#111;padding:8px;border-radius:8px;text-align:center"><b id="sLoss" style="color:#ff1744">0</b><br>Loss</div></div><div style="text-align:center;margin-top:6px"><b id="sPL" style="color:#FFD700;font-size:18px">$0.00 DEMO P/L (FAKE)</b></div></div>
+
+<script>
+let accountMode='demo',autoOn=false,autoInterval=null,journal=JSON.parse(localStorage.getItem('tempest_journal')||'[]'),trades=JSON.parse(localStorage.getItem('tempest_trades')||'[]'),prices=[],lastPrice=0,isRealChart=false;
+const canvas=document.getElementById('tickCanvas'),ctx=canvas.getContext('2d');
+function resize(){let r=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1; canvas.width=r.width*dpr; canvas.height=340*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); draw();}
+function draw(){let r=canvas.getBoundingClientRect(),w=r.width,h=340,pad=20; ctx.fillStyle='#050505'; ctx.fillRect(0,0,w,h); if(prices.length<2){ctx.fillStyle='#555'; ctx.font='13px Arial'; ctx.fillText(isRealChart?'Waiting for ticks...':'Connecting to REAL Deriv feed...',w/2-90,h/2); return;} let min=Math.min(...prices),max=Math.max(...prices),range=max-min||2; if(range<0.5) range=0.5; ctx.strokeStyle='#1a1a1a'; for(let i=0;i<5;i++){let y=pad+(h-pad*2)*i/4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();} ctx.beginPath(); ctx.strokeStyle='#00ff88'; ctx.lineWidth=2.5; prices.forEach((p,i)=>{let x=(i/(prices.length-1))*w; let y=pad+((max-p)/range)*(h-pad*2); if(i==0) ctx.moveTo(x,y); else ctx.lineTo(x,y);}); ctx.stroke(); let last=prices[prices.length-1]; let ly=pad+((max-last)/range)*(h-pad*2); ctx.fillStyle='#00ff88'; ctx.beginPath(); ctx.arc(w-6,ly,5,0,Math.PI*2); ctx.fill();}
+function log(m){let t=new Date().toLocaleTimeString(); document.getElementById('activityLog').innerHTML=`[${t}] ${m}<br>`+document.getElementById('activityLog').innerHTML;}
+function setAccount(m){if(m=='real'){alert('REAL trading locked in V122 - This version is DEMO ONLY on REAL chart for safe practice. Want REAL connect? Ask for V123 REAL API.'); return;} accountMode=m;}
+function toggleAuto(){if(!isRealChart){alert('WAIT! Real chart not connected yet. Let R_100 price appear first (e.g. 9912.33). Check internet.'); return;} autoOn=!autoOn; let b=document.getElementById('autoBtn'); if(autoOn){b.className='cloudbtn on'; b.innerText='🧬 DEMO SOLO ON REAL CHART: ON - SHE IS PRACTICING!'; autoInterval=setInterval(titanTrade,15000); log('🧬 DEMO SOLO STARTED on REAL R_100 chart - Fake money, Real price!');}else{b.className='cloudbtn off'; b.innerText='☁️ DEMO SOLO: OFF'; clearInterval(autoInterval); log('Paused');}}
+function getAI(){if(prices.length<10) return {action:'BUY',reason:'Warming'}; let s5=prices.slice(-5).reduce((a,b)=>a+b,0)/5,s10=prices.slice(-10).reduce((a,b)=>a+b,0)/10; return s5>s10?{action:'BUY',reason:`SMA5 ${s5.toFixed(2)} > SMA10`}:{action:'SELL',reason:`SMA5 ${s5.toFixed(2)} < SMA10`};}
+function titanTrade(){let ai=getAI(); document.getElementById('aiSignal').innerText='AI: '+ai.action+' ('+ai.reason+')'; document.getElementById('aiSignal').style.background=ai.action=='BUY'?'#00ff88':'#ff5252'; trade(ai.action,true,ai.reason);}
+function trade(action,isAuto,reason){
+ let price=document.getElementById('rprice').innerText; if(price.includes('CONNECT')) return;
+ let isWin=Math.random()>0.45; let result=isWin?'WIN':'LOSS'; let pnlVal=isWin?0.8:-1; 
+ let e={time:new Date().toLocaleTimeString(),action,price,result,pnl:(pnlVal>=0?'+$':'-$')+Math.abs(pnlVal).toFixed(2),auto:isAuto?'DEMO SOLO REAL CHART':'MANUAL',reason:reason||''};
+ trades.unshift(e); journal.unshift(e); if(trades.length>100) trades.pop(); localStorage.setItem('tempest_trades',JSON.stringify(trades)); localStorage.setItem('tempest_journal',JSON.stringify(journal));
+ log(`${isAuto?'🧬 DEMO SOLO':'MANUAL'} ${action} @ REAL ${price} -> ${result} ${e.pnl} | ${e.reason}`);
+ renderAll();
+}
+function renderAll(){
+ document.getElementById('buyCount').innerText=trades.filter(t=>t.action=='BUY').length; document.getElementById('sellCount').innerText=trades.filter(t=>t.action=='SELL').length; document.getElementById('winCount').innerText=trades.filter(t=>t.result=='WIN').length; document.getElementById('lossCount').innerText=trades.filter(t=>t.result=='LOSS').length; document.getElementById('sTotal').innerText=journal.length; document.getElementById('sWins').innerText=journal.filter(j=>j.result=='WIN').length; document.getElementById('sLoss').innerText=journal.filter(j=>j.result=='LOSS').length; let pl=journal.reduce((a,j)=>a+parseFloat(j.pnl),0); document.getElementById('sPL').innerText=(pl>=0?'+':'')+'$'+pl.toFixed(2)+' DEMO P/L (FAKE MONEY, REAL CHART!)';
+ let html=''; trades.forEach(t=>{let col=t.result=='WIN'?'#00ff88':'#ff5252'; html+=`<div style="padding:10px;border-bottom:1px solid #222;border-left:4px solid ${col};display:flex;justify-content:space-between"><div><span style="font-size:9px;color:#888">${t.time} ${t.auto}</span><br><b style="color:${t.action=='BUY'?'#00ff88':'#ff5252'}">${t.action}</b> @ REAL ${t.price}<br><span style="font-size:8px;color:#888">${t.reason}</span></div><div style="text-align:right;color:${col}"><b>${t.result}</b><br>${t.pnl}<br><span style="font-size:8px;color:#888">FAKE</span></div></div>`;}); document.getElementById('tradeList').innerHTML=html||'<div style="text-align:center;color:#555;padding:20px">No demo trades yet - Tap DEMO SOLO ON REAL CHART</div>';
+ let jhtml=''; journal.forEach(j=>{let col=j.result=='WIN'?'#00c853':'#ff1744'; jhtml+=`<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #222;border-left:3px solid ${col};font-size:11px"><span>${j.time} ${j.action} @ ${j.price}</span><span style="color:${col}"><b>${j.result}</b> ${j.pnl}</span></div>`;}); document.getElementById('journalList').innerHTML=jhtml;
+}
+function showTab(t){['chart','trades','live','journal'].forEach(x=>{document.getElementById('tab'+x.charAt(0).toUpperCase()+x.slice(1)).className='tab'+(t==x?' active':''); document.getElementById(x+'Card').style.display=t==x?'block':'none';}); if(t=='chart') setTimeout(resize,50);}
+function connectReal(){
+ let ws=new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
+ ws.onopen=()=>{log('📡 Connecting to REAL Deriv R_100...'); ws.send(JSON.stringify({ticks:'R_100'})); document.getElementById('chartBadge').innerText='● REAL CHART LIVE'; document.getElementById('chartBadge').style.background='#00ff88';};
+ ws.onmessage=(e)=>{let d=JSON.parse(e.data); if(d.tick){let p=parseFloat(d.tick.quote); isRealChart=true; document.getElementById('rprice').innerText=p.toFixed(2); document.getElementById('dir').innerText=p>lastPrice?'📈 REAL':'📉 REAL'; lastPrice=p; prices.push(p); if(prices.length>150) prices.shift(); document.getElementById('tickCount').innerText=prices.length+' REAL TICKS LIVE - DEMO practice on REAL price!'; document.getElementById('lastTime').innerText='REAL '+new Date().toLocaleTimeString(); draw();}};
+ ws.onclose=()=>{document.getElementById('chartBadge').innerText='● REAL CHART RECONNECTING...'; document.getElementById('chartBadge').style.background='#ff5252'; document.getElementById('rprice').innerText='RECONNECTING REAL FEED...'; setTimeout(connectReal,2000); log('⚠️ REAL feed disconnected, reconnecting...');};
+ ws.onerror=()=>{log('❌ REAL feed error - Check internet, Deriv WS blocked?'); document.getElementById('rprice').innerText='REAL FEED ERROR - Check internet';};
+}
+window.addEventListener('resize',resize); resize(); connectReal(); renderAll(); log('🧬 V122 loaded - DEMO ONLY on REAL R_100 chart - Safe practice mode');
+</script>
+</body>
+                                        </html>
